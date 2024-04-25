@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View } from "react-native";
+import * as playerMock from './../mock/player.json';
+import * as matchesMock from './../mock/matches.json';
 
 // eslint-disable-next-line no-unused-vars
 const Matches = ({ navigation, route }) => {
@@ -11,6 +13,7 @@ const Matches = ({ navigation, route }) => {
 
   useEffect(
     () => {
+      setAccountInfo(playerMock.default);setMatches(matchesMock.default);return () => { ignore = true; };
       let ignore = false;
       setAccountInfo({});
       fetch(`https://api.opendota.com/api/players/${player.account_id}`)
@@ -20,6 +23,9 @@ const Matches = ({ navigation, route }) => {
             setAccountInfo(data);
           }
         });
+
+        // @TODO: fetch matches
+
       return () => {
         ignore = true;
       };
@@ -27,6 +33,17 @@ const Matches = ({ navigation, route }) => {
     // Run this effect only if player has changed
     [player],
   );
+
+  const matchesList = matches.map(match => (
+    <div class="table-row" key={match.match_id}>
+      <div class="td"><a onClick={() => navigation.navigate('Match', { match })}>{match.match_id}</a></div>
+      <div class="td">{match.start_time}</div>
+      <div class="td">{match.duration}</div>
+      <div class="td">{match.kills}</div>
+      <div class="td">{match.deaths}</div>
+      <div class="td">{match.assists}</div>
+    </div>
+  ))
   // Need to plan this more
   // - some short player info bar on top of page
   // - last 5 matches-list, where you can click from
@@ -39,7 +56,17 @@ const Matches = ({ navigation, route }) => {
         </h2>
       </div>
       <div className="table">
-        <div></div>
+        <div class="table-header">
+          <div class="th">match_id</div>
+          <div class="th">start_time</div>
+          <div class="th">duration</div>
+          <div class="th">kills</div>
+          <div class="th">deaths</div>
+          <div class="th">assists</div>
+        </div>
+        <div class="table-body">
+          {matchesList}
+        </div>
       </div>
     </View>
   );
